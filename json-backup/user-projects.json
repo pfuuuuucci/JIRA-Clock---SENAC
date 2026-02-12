@@ -1,0 +1,21 @@
+{
+  "users": {
+    "pfucci": {
+      "DELIVERY": {
+        "displayName": "OPE-INT-1000-DELIVERY",
+        "jiraProjectKey": "VTGGO",
+        "searchProject": "OPE-INT-1000-DELIVERY"
+      },
+      "SEGURADORA SOMPO": {
+        "displayName": "OPE-SOMPO-4600006090-SUSTENTACAO",
+        "jiraProjectKey": "SOMPOSUS",
+        "searchProject": "OPE-SOMPO-4600006090-SUSTENTACAO"
+      },
+      "TJRJ": {
+        "displayName": "OPE-TJRJ-0333-FSW2",
+        "jiraProjectKey": "TJRJFSW2",
+        "searchProject": "OPE-TJRJ-0333-FSW2"
+      }
+    }
+  }
+}
