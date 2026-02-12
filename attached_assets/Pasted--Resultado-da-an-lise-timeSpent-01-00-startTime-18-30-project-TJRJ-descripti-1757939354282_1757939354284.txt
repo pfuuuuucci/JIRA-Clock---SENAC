@@ -1,0 +1,110 @@
+✅ Resultado da análise: {
+  timeSpent: '01:00',
+  startTime: '18:30',
+  project: 'TJRJ',
+  description: 'gestão de atividades',
+  date: 2025-09-15T00:00:00.000Z,
+  originalText: 'no dia 15/09/2025 eu trabalhei no projeto TJRJ das 18:30 às 19:30 em gestão de atividades ',
+  hours: '1h',
+  minutes: null,
+  isSpecificDate: true,
+  searchKeywords: 'gestão de atividades',
+  userProjects: {
+    DELIVERY: {
+      displayName: 'OPE-INT-1000-DELIVERY',
+      jiraProjectKey: 'VTGGO',
+      searchProject: 'OPE-INT-1000-DELIVERY'
+    },
+    'SEGURADORA SOMPO': {
+      displayName: 'OPE-SOMPO-4600006090-SUSTENTACAO',
+      jiraProjectKey: 'SOMPOSUS',
+      searchProject: 'OPE-SOMPO-4600006090-SUSTENTACAO'
+    },
+    TJRJ: {
+      displayName: 'OPE-TJRJ-0333-FSW2',
+      jiraProjectKey: 'TJRJFSW2',
+      searchProject: 'OPE-TJRJ-0333-FSW2'
+    },
+    GENTE: {
+      displayName: 'OPE-INT-1000-GENTEEGESTAO',
+      jiraProjectKey: 'VTGGENTE',
+      searchProject: 'OPE-INT-1000-GENTEEGESTAO'
+    }
+  }
+}
+🔍 Debug:
+   - Tempo: 01:00
+   - Projeto: TJRJ
+   - Palavras-chave: gestão de atividades
+   - Descrição: gestão de atividades
+🔍 [SEARCH-TICKETS] Iniciando busca para usuário: pfucci
+📋 [SEARCH-TICKETS] Projeto: TJRJ, Palavras-chave: gestão de atividades
+✅ [SEARCH-TICKETS] Credenciais encontradas para: pfucci@vertigo.com.br
+📋 [SEARCH-TICKETS] Projetos do usuário: [ 'DELIVERY', 'SEGURADORA SOMPO', 'TJRJ', 'GENTE' ]
+✅ [SEARCH-TICKETS] Projeto mapeado: {
+  displayName: 'OPE-TJRJ-0333-FSW2',
+  jiraProjectKey: 'TJRJFSW2',
+  searchProject: 'OPE-TJRJ-0333-FSW2'
+}
+🔍 [SEARCH-TICKETS] JQL: project = "TJRJFSW2" AND status != "Concluído" ORDER BY updated DESC
+🔑 [SEARCH-TICKETS] Auth configurado para: pfucci@vertigo.com.br
+✅ [SEARCH-TICKETS] Resposta JIRA recebida. Status: 200
+📊 [SEARCH-TICKETS] Total de issues retornadas: 50
+📋 [SEARCH-TICKETS] Total de issues encontradas: 50
+📋 [SEARCH-TICKETS] Tickets mapeados: [
+  'TJRJFSW2-14: Gestão de atividades, acompanhamento de status, controle de horas, documentações e reuniões',
+  'TJRJFSW2-401: #115540 - Acessibilidade WCAG PJE e demais páginas relacionadas',
+  'TJRJFSW2-392: #115388 - SSO - Single Sign On',
+  'TJRJFSW2-406: #115403 - Responsividade de Portais',
+  'TJRJFSW2-15: Reuniões de status com os clientes',
+  'TJRJFSW2-16: Reuniões diárias do time TJRJ',
+  'TJRJFSW2-387: #115342 - Análise para descontinuidade de domínio interno do Portal institucional',
+  'TJRJFSW2-280: Atividades de arquitetura',
+  'TJRJFSW2-358: #115022- Implementação para Protótipo do Catálogo de Aplicações da SGTEC',
+  'TJRJFSW2-416: #115553 - Portal dos Juízados Especiais',
+  'TJRJFSW2-422: #115625 - Análise do Google Analytics do Portal do Conhecimento',
+  'TJRJFSW2-388: Aguardando alocação',
+  'TJRJFSW2-7: Cadastro de conteúdo - Yago Carvalho',
+  'TJRJFSW2-423: #115643 - Inclusão de atribuição no Sistema de Agendamento de Audiência',
+  'TJRJFSW2-404: #115561 - Responsividade dos vídeos',
+  'TJRJFSW2-417: #115594 - Comportamento Estranho do Rybená no Portal dos Precatórios',
+  'TJRJFSW2-6: Cadastro de conteúdo - Lucas Cunha',
+  'TJRJFSW2-395: #115513 - Sandbox Upgrade Liferay',
+  'TJRJFSW2-409: #115428 - Equalização HML e PRD',
+  'TJRJFSW2-380: #115185 - Contagem de acessos as Noticias Liferay',
+  'TJRJFSW2-397: #115456 - Ajuste do formato da hora do portal',
+  'TJRJFSW2-384: #115315 - Portal do Conhecimento',
+  'TJRJFSW2-382: #115211 - Adequação de Acessibilidade WCAG para Portais Corregedoria, eProc, Portal Institucional e Precatórios',
+  'TJRJFSW2-413: #115142 - Ajustes e Testes do Botão de Impressão',
+  'TJRJFSW2-408: #115325 - Ajustes Ordenação Publicação de Documento no SIGA - PAT',
+  'TJRJFSW2-415: #115554 - Inclusão do Objeto de Vídeos no Site do Museu da Justiça',
+  'TJRJFSW2-407: #115555 - Contador intranet',
+  'TJRJFSW2-405: #115566 - Responsividade portal do conhecimento',
+  'TJRJFSW2-403: #115550 - Troca da palavra login por Intranet',
+  'TJRJFSW2-376: #114849 - Análise da equalização de ambientes',
+  'TJRJFSW2-421: #115392 - Inserir "..." para limitação de caracteres nas notícias da Intranet',
+  'TJRJFSW2-399: 114745 - Hotfix Liferay - Acessibilidade - Feedback para usuário quando sai de um evento para outro no calendário',
+  'TJRJFSW2-394: #115426 - Erro no Agenda Audi',
+  'TJRJFSW2-36: Desenvolvimento do time, estudos e mentoria',
+  'TJRJFSW2-349: #114848 - Criação de páginas em homologação no Liferay com noindex por padrão"',
+  'TJRJFSW2-361: #115020 - RE: 114671 - RE: Descrição de imagens que não contenham texto descritivo - Acessibilidade',
+  'TJRJFSW2-17: Apoio técnico ao time do TJRJ',
+  'TJRJFSW2-402: #115562 - Atualização dos ícones de redes sociais no site do TJRJ',
+  'TJRJFSW2-420: #114751 - Acessibilidade Liferay - Limitação na detecção de atividades que derrubam a sessão',
+  'TJRJFSW2-419: #114747 - Acessibilidade Liferay - Feedback para usuário de baixa visão quando sair do componente de calendário',
+  'TJRJFSW2-418: #114746 - Acessibilidade Liferay - Tipos de Visualização do Calendário (Dia / Semana / Mês | Sem informar ao usuário de baixa visão)',
+  'TJRJFSW2-414: #115564 - Erro na Combo de Portais do Portal Institucional com o Rybená',
+  'TJRJFSW2-412: #115246 - Criação de Ambiente de Desenvolvimento dentro do Ambiente do TJRJ',
+  'TJRJFSW2-411: #115498 - Habilitar HSTS no Portal do TJRJ',
+  'TJRJFSW2-410: #115408 - Upgrade Liferay',
+  'TJRJFSW2-400: #115472 - Portal TJRJ - Páginas de usuários expostas',
+  'TJRJFSW2-398: #115483 - Correção de erro ao carregar Rybená',
+  'TJRJFSW2-396: #115467 - Solicitação - Atualizações no Portal dos COGENs',
+  'TJRJFSW2-370: #115103 - ENC: Solicito alteração Cogen',
+  'TJRJFSW2-375: #115123 - [Projeto Migração Códigos Liferay para nuvem TJRJ] Etapa 1: Refazer Mirror entre repositórios'
+]
+🔍 [SEARCH-TICKETS] Palavras-chave para filtro: [ 'gestão', 'atividades' ]
+✅ [SEARCH-TICKETS] Ticket corresponde: TJRJFSW2-14 - Gestão de atividades, acompanhamento de status, controle de horas, documentações e reuniões
+✅ [SEARCH-TICKETS] Ticket corresponde: TJRJFSW2-280 - Atividades de arquitetura
+✅ [SEARCH-TICKETS] Ticket corresponde: TJRJFSW2-420 - #114751 - Acessibilidade Liferay - Limitação na detecção de atividades que derrubam a sessão
+📋 [SEARCH-TICKETS] RESULTADO FINAL - Total encontrados: 50, Filtrados: 3
