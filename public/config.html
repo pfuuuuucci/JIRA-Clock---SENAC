@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Configurações - JIRA Voice Assistant</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .config-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .config-section {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .config-section h3 {
+            color: #1f2937;
+            margin: 0 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3b82f6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .project-item {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-info {
+            flex: 1;
+        }
+
+        .project-info div {
+            margin-bottom: 5px;
+        }
+
+        .project-info strong {
+            color: #1f2937;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px;
+            font-size: 1.1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            background: transparent;
+            color: #6b7280;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-danger:hover {
+            color: #dc2626;
+            background: transparent;
+            transform: translateY(-1px);
+        }
+
+        .new-project-form {
+            background: #f0f9ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .new-project-form h4 {
+            color: #1e40af;
+            margin: 0 0 15px 0;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .status-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status-success {
+            background: #f0fdf4;
+            color: #059669;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        /* Garantir que botões ocupem toda a largura como na página principal */
+        .btn {
+            width: 100% !important;
+            box-sizing: border-box;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="config-container">
+        <header>
+            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                <div style="text-align: left;">
+                    <h1>Configurações</h1>
+                    <p id="headerSubtitle">Apontamentos JIRA - </p>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                    <a href="/" class="header-icon-btn" title="Voltar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                        </svg>
+                    </a>
+                    <button class="header-icon-btn" style="visibility: hidden;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- Seção de Credenciais -->
+        <div class="config-section">
+            <h3>🔐 Credenciais JIRA</h3>
+            <form id="credentialsForm">
+                <div class="form-group">
+                    <label for="jiraUsername">Username JIRA (e-mail completo):</label>
+                    <input type="email" id="jiraUsername" placeholder="seu.usuario@dominio.com" required>
+                    <small style="color: #6b7280;">Por favor, insira seu e-mail corporativo completo.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="jiraApiToken">JIRA API Token:</label>
+                    <input type="password" id="jiraApiToken" placeholder="Cole aqui seu API Token do JIRA" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="jiraUserId">JIRA User ID:</label>
+                    <input type="text" id="jiraUserId" placeholder="Ex: paulo.fucci@dominio.com ou account ID" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="tempoApiToken">Tempo API Token:</label>
+                    <input type="password" id="tempoApiToken" placeholder="Cole aqui seu API Token do Tempo">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-icon"></span>
+                    SALVAR CREDENCIAIS
+                </button>
+
+            </form>
+        </div>
+
+        <!-- Seção de Projetos -->
+        <div class="config-section">
+            <h3>📋 Projetos JIRA</h3>
+
+            <div id="projectsList">
+                <!-- Projetos serão carregados aqui via JavaScript -->
+            </div>
+
+            <div class="new-project-form">
+                <h4>➕ Adicionar Novo Projeto</h4>
+                <form id="projectForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="projectName">Nome do Projeto:</label>
+                            <input type="text" id="projectName" placeholder="Ex: TJRJ" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectCode">Código Completo:</label>
+                            <input type="text" id="projectCode" placeholder="Ex: OPE-TJRJ-0333-FSW2" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectKey">Chave JIRA:</label>
+                            <input type="text" id="projectKey" placeholder="Ex: TJRJFSW2" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        ADICIONAR PROJETO
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; margin-top: 40px; color: #6b7280;">
+        <p>Powered by GRUPO 02 - SENAC</p>
+    </footer>
+
+    <script>
+        // Verificar autenticação ANTES de mostrar qualquer conteúdo
+        const currentUser = sessionStorage.getItem('currentUser');
+
+        if (!currentUser) {
+            // Usuário não autenticado - redirecionar IMEDIATAMENTE para login
+            window.location.replace('/login.html');
+        }
+
+        class ConfigManager {
+            constructor() {
+                this.bindEvents();
+                this.loadCurrentConfig();
+                this.loadProjects();
+            }
+
+            getCurrentUser() {
+                try {
+                    const userData = sessionStorage.getItem('currentUser');
+                    return userData ? JSON.parse(userData) : null;
+                } catch (error) {
+                    console.error('Erro ao obter usuário atual:', error);
+                    return null;
+                }
+            }
+
+            getAuthHeaders() {
+                const userData = sessionStorage.getItem('currentUser');
+                console.log('🔑 getAuthHeaders - currentUser:', userData);
+
+                if (!userData) {
+                    console.error('❌ Usuário não encontrado no sessionStorage!');
+                    alert('Sessão expirada. Redirecionando para login...');
+                    window.location.href = '/login.html';
+                    return {};
+                }
+
+                try {
+                    const user = JSON.parse(userData);
+                    return {
+                        'x-user-id': user.username // Assuming username is the correct identifier
+                    };
+                } catch (error) {
+                    console.error('Erro ao parsear usuário do sessionStorage:', error);
+                    alert('Erro na sessão. Redirecionando para login...');
+                    window.location.href = '/login.html';
+                    return {};
+                }
+            }
+
+            bindEvents() {
+                document.getElementById('credentialsForm').addEventListener('submit', (e) => this.saveCredentials(e));
+                document.getElementById('projectForm').addEventListener('submit', (e) => this.addProject(e));
+            }
+
+            async loadCurrentConfig() {
+                try {
+                    const response = await fetch('/api/config', {
+                        headers: this.getAuthHeaders()
+                    });
+                    const config = await response.json();
+
+                    if (config.success) {
+                        document.getElementById('jiraUsername').value = config.credentials.username || '';
+                        document.getElementById('jiraUserId').value = config.credentials.userId || '';
+                        // Não carregar tokens por segurança
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar configuração:', error);
+                }
+            }
+
+            async loadProjects() {
+                try {
+                    const response = await fetch('/api/config/projects', {
+                        headers: this.getAuthHeaders()
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.renderProjects(result.projects);
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar projetos:', error);
+                }
+            }
+
+            renderProjects(projects) {
+                const projectsList = document.getElementById('projectsList');
+
+                if (projects.length === 0) {
+                    projectsList.innerHTML = `
+                        <div style="text-align: center; color: #6b7280; padding: 20px;">
+                            Nenhum projeto configurado ainda.
+                        </div>
+                    `;
+                    return;
+                }
+
+                projectsList.innerHTML = projects.map(project => `
+                    <div class="project-item">
+                        <div class="project-info">
+                            <div><strong>Nome:</strong> ${project.name}</div>
+                            <div><strong>Código:</strong> ${project.displayName}</div>
+                            <div><strong>Chave:</strong> ${project.jiraProjectKey}</div>
+                        </div>
+                        <div class="project-actions">
+                            <button class="btn-small " onclick="configManager.deleteProject('${project.name}')" title="Remover projeto">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            async saveCredentials(e) {
+                e.preventDefault();
+
+                const username = document.getElementById('jiraUsername').value.trim();
+                const apiToken = document.getElementById('jiraApiToken').value.trim();
+                const userId = document.getElementById('jiraUserId').value.trim();
+                const tempoToken = document.getElementById('tempoApiToken').value.trim();
+
+                if (!username || !apiToken || !userId) {
+                    this.showStatus('Preencha todos os campos obrigatórios!', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/config/credentials', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...this.getAuthHeaders()
+                        },
+                        body: JSON.stringify({
+                            username,
+                            apiToken,
+                            userId,
+                            tempoToken
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showStatus('✅ Credenciais salvas com sucesso!', 'success');
+                        // Limpar campos de senha
+                        document.getElementById('jiraApiToken').value = '';
+                        document.getElementById('tempoApiToken').value = '';
+                    } else {
+                        this.showStatus('❌ ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    this.showStatus('❌ Erro ao salvar credenciais', 'error');
+                    console.error(error);
+                }
+            }
+
+            async addProject(e) {
+                e.preventDefault();
+
+                const name = document.getElementById('projectName').value.trim().toUpperCase();
+                const displayName = document.getElementById('projectCode').value.trim();
+                const jiraProjectKey = document.getElementById('projectKey').value.trim().toUpperCase();
+
+                if (!name || !displayName || !jiraProjectKey) {
+                    this.showStatus('Preencha todos os campos do projeto!', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/config/projects', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...this.getAuthHeaders()
+                        },
+                        body: JSON.stringify({
+                            name,
+                            displayName,
+                            jiraProjectKey
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showStatus('✅ Projeto adicionado com sucesso!', 'success');
+                        document.getElementById('projectForm').reset();
+                        this.loadProjects(); // Recarregar lista
+                    } else {
+                        this.showStatus('❌ ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    this.showStatus('❌ Erro ao adicionar projeto', 'error');
+                    console.error(error);
+                }
+            }
+
+            async deleteProject(projectName) {
+                if (!confirm(`Tem certeza que deseja remover o projeto "${projectName}"?`)) {
+                    return;
+                }
+
+                try {
+                    console.log('🗑️ Removendo projeto:', projectName);
+                    console.log('🔑 Headers de auth:', this.getAuthHeaders());
+
+                    const response = await fetch(`/api/config/projects/${encodeURIComponent(projectName)}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...this.getAuthHeaders()
+                        }
+                    });
+
+                    console.log('📡 Response status:', response.status);
+                    const result = await response.json();
+                    console.log('📋 Response data:', result);
+
+                    if (result.success) {
+                        this.showStatus(`✅ Projeto ${projectName} removido com sucesso!`, 'success');
+                        this.loadProjects(); // Recarregar lista
+                    } else {
+                        this.showStatus('❌ ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    this.showStatus('❌ Erro ao remover projeto', 'error');
+                    console.error('Erro detalhado:', error);
+                }
+            }
+
+            showStatus(message, type) {
+                const statusEl = document.getElementById('statusMessage');
+                statusEl.textContent = message;
+                statusEl.className = `status-message status-${type}`;
+                statusEl.style.display = 'block';
+
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        const configManager = new ConfigManager();
+
+        // Função logout
+        function logout() {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = '/login.html';
+        }
+
+
+
+        // Atualizar subtítulo com nome do usuário
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const userData = JSON.parse(currentUser);
+                const headerSubtitle = document.getElementById('headerSubtitle');
+                if (headerSubtitle && userData && userData.username) {
+                    headerSubtitle.textContent = `Apontamentos JIRA - ${userData.username}`;
+                }
+            } catch (error) {
+                console.error('Erro ao verificar usuário:', error);
+            }
+        });
+    </script>
+</body>
+</html>

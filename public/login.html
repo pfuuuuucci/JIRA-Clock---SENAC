@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Login - JIRA Voice Assistant</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .login-container {
+            max-width: 450px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .login-form {
+            padding: 30px;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .token-input {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .check-user-btn, .verify-token-btn {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .check-user-btn:hover, .verify-token-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .message.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .back-btn:hover {
+            color: #374151;
+        }
+
+        .version-info {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            opacity: 0.9;
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>JIRA Voice Assistant</h1>
+            <p>Sistema Inteligente de Apontamentos</p>
+            <div id="versionInfo" class="version-info"></div>
+        </div>
+
+        <div class="login-form">
+            <!-- Passo 1: Informar username -->
+            <div id="step1" class="form-step active">
+                <div class="input-group">
+                    <label for="username">Seu email:</label>
+                    <input type="text" id="username" placeholder="Digite seu email completo" autocomplete="username" autocapitalize="off">
+                </div>
+
+                <button type="button" class="check-user-btn" onclick="checkUser()">
+                    <span id="checkBtnText">Verificar Usuário</span>
+                </button>
+            </div>
+
+            <!-- Passo 2: Validar token -->
+            <div id="step2" class="form-step">
+                <button type="button" class="back-btn" onclick="goBack()">← Voltar</button>
+
+                <div id="tokenMessage" class="message info">
+                    Token enviado para seu email. Verifique sua caixa de entrada.
+                </div>
+
+                <div class="input-group">
+                    <label for="token">Token de 8 dígitos:</label>
+                    <input type="text" id="token" class="token-input" placeholder="XXXXXXXX" maxlength="8" autocomplete="one-time-code">
+                </div>
+
+                <button type="button" class="verify-token-btn" onclick="validateToken()">
+                    <span id="tokenBtnText">Validar Token</span>
+                </button>
+            </div>
+
+            <!-- Mensagens -->
+            <div id="messageArea"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentUsername = '';
+
+        // NOVO: Gerar device fingerprint único
+        function generateDeviceFingerprint() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('Device fingerprint', 2, 2);
+
+            const fingerprint = btoa(
+                navigator.userAgent + 
+                screen.width + 
+                screen.height + 
+                navigator.platform + 
+                (navigator.hardwareConcurrency || 'unknown') +
+                canvas.toDataURL() +
+                navigator.language +
+                new Date().getTimezoneOffset()
+            ).substring(0, 32);
+
+            console.log('🔐 Device fingerprint gerado:', fingerprint.substring(0, 10) + '...');
+            return fingerprint;
+        }
+
+        // NOVO: Verificar se token diário ainda é válido
+        function isDailyTokenValid(username, deviceFingerprint) {
+            try {
+                // Verificar se suporta localStorage (modo incógnito pode não suportar)
+                if (!window.localStorage) {
+                    console.log('🕵️ Modo incógnito detectado - sempre pedir token');
+                    return false;
+                }
+
+                const tokenKey = `jira_daily_token_${username}_${deviceFingerprint}`;
+                const tokenData = localStorage.getItem(tokenKey);
+
+                if (!tokenData) {
+                    console.log('🔐 Nenhum token diário encontrado');
+                    return false;
+                }
+
+                const data = JSON.parse(tokenData);
+                const validatedAt = new Date(data.validatedAt);
+                const now = new Date();
+                const diffHours = (now - validatedAt) / (1000 * 60 * 60);
+
+                if (diffHours > 12) {
+                    console.log(`⏰ Token diário expirado (${diffHours.toFixed(1)}h > 12h)`);
+                    localStorage.removeItem(tokenKey);
+                    return false;
+                }
+
+                console.log(`✅ Token diário válido (${diffHours.toFixed(1)}h/12h)`);
+                return true;
+            } catch (error) {
+                console.error('Erro ao verificar token diário:', error);
+                return false;
+            }
+        }
+
+        // NOVO: Salvar token diário válido
+        function saveDailyToken(username, deviceFingerprint) {
+            try {
+                if (!window.localStorage) {
+                    console.log('🕵️ Modo incógnito - não salvar token diário');
+                    return;
+                }
+
+                const tokenKey = `jira_daily_token_${username}_${deviceFingerprint}`;
+                const tokenData = {
+                    validatedAt: new Date().toISOString(),
+                    expiresAt: new Date(Date.now() + (12 * 60 * 60 * 1000)).toISOString(),
+                    deviceFingerprint: deviceFingerprint
+                };
+
+                localStorage.setItem(tokenKey, JSON.stringify(tokenData));
+                console.log('🔐 Token diário salvo localmente');
+            } catch (error) {
+                console.error('Erro ao salvar token diário:', error);
+            }
+        }
+
+        function showMessage(message, type = 'info') {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = `<div class="message ${type}">${message}</div>`;
+        }
+
+        function clearMessage() {
+            document.getElementById('messageArea').innerHTML = '';
+        }
+
+        function showStep(stepNumber) {
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+        }
+
+        function goBack() {
+            showStep(1);
+            clearMessage();
+        }
+
+        async function checkUser() {
+            const username = document.getElementById('username').value.trim();
+            const checkBtn = document.querySelector('#step1 .check-user-btn');
+            const btnText = document.getElementById('checkBtnText');
+
+            if (!username) {
+                showMessage('❌ Informe seu email', 'error');
+                return;
+            }
+
+            // Validar formato do email
+            if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(username)) {
+                showMessage('❌ Formato de email inválido', 'error');
+                return;
+            }
+
+            checkBtn.disabled = true;
+            btnText.textContent = 'Verificando...';
+            clearMessage();
+
+            // NOVO: Gerar device fingerprint
+            const deviceFingerprint = generateDeviceFingerprint();
+
+            // NOVO: Verificar token diário primeiro
+            if (isDailyTokenValid(username, deviceFingerprint)) {
+                console.log('✅ Token diário válido - fazendo login direto');
+                showMessage('✅ Login direto - token diário válido!', 'success');
+
+                // Simular usuário autenticado para login direto
+                const userData = {
+                    username: username,
+                    email: username,
+                    jiraUsername: username,
+                    lastLogin: new Date().toISOString()
+                };
+
+                await loginUser(userData);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/check-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        username: username,
+                        deviceFingerprint: deviceFingerprint 
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    currentUsername = username;
+
+                    // VERIFICAR: Se dailyTokenValid for true, fazer login direto
+                    if (result.data.dailyTokenValid) {
+                        console.log('✅ Token diário validado pelo servidor - fazendo login direto');
+                        showMessage('✅ Login direto - já validado hoje neste dispositivo!', 'success');
+
+                        const userData = {
+                            username: username,
+                            email: result.data.email,
+                            jiraUsername: username,
+                            lastLogin: new Date().toISOString()
+                        };
+
+                        await loginUser(userData);
+                        return;
+                    }
+
+                    // SEMPRE mostrar tela de token se chegou até aqui
+                    if (result.data.tokenSent) {
+                        const accessTypeText = result.data.isFirstAccess 
+                            ? '🆕 <strong>Primeiro acesso</strong>'
+                            : '🔐 <strong>Validação de segurança diária</strong>';
+
+                        document.getElementById('tokenMessage').innerHTML = 
+                            `✅ Token enviado para <strong>${result.data.email}</strong><br>
+                             ${accessTypeText}<br>
+                             Este dispositivo será lembrado por 12 horas.`;
+                    } else {
+                        document.getElementById('tokenMessage').innerHTML = 
+                            `❌ Erro ao enviar email para <strong>${result.data.email}</strong><br>
+                             Tente novamente ou contate o administrador.`;
+                        document.getElementById('tokenMessage').className = 'message error';
+                    }
+                    showStep(2);
+                } else {
+                    showMessage(`❌ ${result.message}`, 'error');
+                }
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showMessage('❌ Erro de conexão com o servidor', 'error');
+            } finally {
+                checkBtn.disabled = false;
+                btnText.textContent = 'Verificar Usuário';
+            }
+        }
+
+        async function validateToken() {
+            const token = document.getElementById('token').value.trim();
+            const tokenBtn = document.querySelector('#step2 .verify-token-btn');
+            const btnText = document.getElementById('tokenBtnText');
+
+            if (!token || token.length !== 8) {
+                showMessage('❌ Digite o token de 8 dígitos', 'error');
+                return;
+            }
+
+            tokenBtn.disabled = true;
+            btnText.textContent = 'Validando...';
+            clearMessage();
+
+            // NOVO: Incluir device fingerprint na validação
+            const deviceFingerprint = generateDeviceFingerprint();
+
+            try {
+                const response = await fetch('/api/auth/validate-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        username: currentUsername,
+                        token: token,
+                        deviceFingerprint: deviceFingerprint 
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // NOVO: Salvar token diário local (12 horas)
+                    saveDailyToken(currentUsername, deviceFingerprint);
+                    console.log('🔐 Token diário salvo - próximos acessos por 12h serão diretos');
+
+                    await loginUser(result.data.user);
+                } else {
+                    showMessage(`❌ ${result.message}`, 'error');
+                }
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showMessage('❌ Erro de conexão com o servidor', 'error');
+            } finally {
+                tokenBtn.disabled = false;
+                btnText.textContent = 'Validar Token';
+            }
+        }
+
+        async function loginUser(user) {
+            // Salvar dados do usuário no sessionStorage
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+
+            showMessage('✅ Login realizado com sucesso! Redirecionando...', 'success');
+
+            // Redirecionar para a página principal após 1 segundo
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
+        }
+
+        // Carregar informações de versão
+        async function loadVersionInfo() {
+            try {
+                console.log('🔄 Carregando informações de versão...');
+                const response = await fetch('/versao.json');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const versionData = await response.json();
+                console.log('📊 Dados de versão carregados:', versionData);
+
+                const versionInfo = document.getElementById('versionInfo');
+                if (versionInfo && versionData) {
+                    versionInfo.innerHTML = `
+                        <div>Deploy: ${versionData.deploy}</div>
+                        <div>Versão: ${versionData.versao}</div>
+                    `;
+                    console.log('✅ Versão exibida com sucesso');
+                } else {
+                    console.error('❌ Elemento versionInfo não encontrado ou dados inválidos');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar versão:', error);
+                // Mostrar informações básicas mesmo com erro
+                const versionInfo = document.getElementById('versionInfo');
+                if (versionInfo) {
+                    versionInfo.innerHTML = `
+                        <div>Deploy: --/--/----, --:--</div>
+                        <div>Versão: Sistema</div>
+                    `;
+                }
+            }
+        }
+
+        // Auto-focar no input de username ao carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadVersionInfo();
+            document.getElementById('username').focus();
+
+            // Enter para submeter
+            document.getElementById('username').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkUser();
+            });
+
+            document.getElementById('token').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') validateToken();
+            });
+        });
+    </script>
+</body>
+</html>

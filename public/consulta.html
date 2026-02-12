@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Apontamentos - JIRA Voice Assistant</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .consulta-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .consulta-section {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .consulta-section h3 {
+            color: #1f2937;
+            margin: 0 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3b82f6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px; 
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .worklog-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-left: 0;
+            table-layout: fixed;
+        }
+
+        .worklog-table th,
+        .worklog-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+        }
+
+        .worklog-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+            padding: 10px 8px;
+        }
+
+        .worklog-table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .status-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status-success {
+            background: #f0fdf4;
+            color: #059669;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .status-info {
+            background: #f0f9ff;
+            color: #0369a1;
+            border: 1px solid #bfdbfe;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .total-row {
+            background-color: #f3f4f6 !important;
+            border-top: 2px solid #3b82f6;
+        }
+
+        .total-row td {
+            font-weight: 600;
+            color: #1f2937;
+            border-bottom: none;
+            padding: 15px 12px;
+        }
+
+        .delete-btn {
+            background: transparent;
+            color: #6b7280;
+            border: none;
+            padding: 2px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            width: 24px;
+            height: 24px;
+        }
+
+        .delete-btn:hover {
+            color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .worklog-table td:first-child {
+            text-align: center;
+            width: 30px;
+            vertical-align: middle;
+            padding: 2px;
+        }
+
+        .worklog-table th:first-child {
+            text-align: center;
+            width: 30px;
+            padding: 4px 2px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-confirm {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Garantir que botões ocupem toda a largura como na página principal */
+        .btn {
+            width: 100% !important;
+            box-sizing: border-box;
+        }
+
+        /* Solução definitiva para o campo de data ter exatamente o mesmo tamanho dos botões */
+        .form-group {
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow: hidden !important;
+            border-radius: 8px !important;
+
+        }
+
+        /*.form-group input[type="date"] {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
+            padding: 20px 20px !important;
+            min-height: 55px !important;
+            height: 55px !important;
+            border: 2px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
+            background: white !important;
+            transition: all 0.3s ease;
+            overflow: hidden !important;
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+            display: block !important;
+        }
+*/
+        .form-group input[type="date"]:focus {
+            outline: none !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        }
+
+        /* Garantir que o calendário interno não vaze */
+        .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+            width: 20px !important;
+            height: 20px !important;
+            margin-left: auto !important;
+            margin-right: 10px !important;
+        }
+
+        .form-group label {
+            font-weight: 600 !important;
+            color: #374151 !important;
+            margin-bottom: 8px !important;
+            display: block !important;
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="consulta-container">
+        <header>
+            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                <div style="text-align: left;">
+                    <h1>Apontamentos</h1>
+                    <p id="headerSubtitle">Apontamentos JIRA - </p>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                    <a href="/" class="header-icon-btn" title="Voltar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                        </svg>
+                    </a>
+                    
+                    <a href="/config.html" class="header-icon-btn" title="Configurações">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+                            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.540l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- Seção de Consulta -->
+        <div class="consulta-section">
+            <h3>📅 Consultar Apontamentos</h3>
+            <form id="consultaForm">
+                <div class="form-group">
+                    <input type="date" class="form-control" id="consultaDate" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    CONSULTAR APONTAMENTOS
+                </button>
+            </form>
+        </div>
+
+        <!-- Seção de Resultados -->
+        <div class="consulta-section" id="resultadosSection" style="display: none;">
+            <h3>📋 Apontamentos Encontrados</h3>
+            <div id="resultadosContent">
+                <!-- Resultados serão carregados aqui -->
+            </div>
+        </div>
+
+        <!-- Modal de Confirmação -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <h3>🗑️ Excluir Apontamento</h3>
+                <p>Tem certeza que deseja excluir este apontamento?</p>
+                <p><strong>ID:</strong> <span id="worklogIdToDelete"></span></p>
+                <p><strong>Horário:</strong> <span id="worklogTimeToDelete"></span></p>
+                <p><strong>Duração:</strong> <span id="worklogDurationToDelete"></span></p>
+                <div class="modal-buttons">
+                    <button id="confirmDelete" class="btn-confirm">🗑️ Confirmar</button>
+                    <button id="cancelDelete" class="btn-cancel">❌ Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar autenticação
+        const currentUser = sessionStorage.getItem('currentUser');
+
+        if (!currentUser) {
+            window.location.replace('/login.html');
+        }
+
+        class ConsultaManager {
+            constructor() {
+                this.bindEvents();
+                this.setDefaultDate();
+                this.bindModalEvents();
+            }
+
+            setDefaultDate() {
+                // Verificar hora atual
+                const now = new Date();
+                const currentHour = now.getHours();
+
+                // Se for 21:00 ou mais, usar o dia anterior como padrão
+                if (currentHour >= 21) {
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    const defaultDate = yesterday.toISOString().split('T')[0];
+                    document.getElementById('consultaDate').value = defaultDate;
+                    console.log(`🕘 Após 21:00 (${currentHour}h) - usando data anterior: ${defaultDate}`);
+                } else {
+                    // Antes das 21:00, usar hoje normalmente
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById('consultaDate').value = today;
+                    console.log(`🕐 Antes das 21:00 (${currentHour}h) - usando data atual: ${today}`);
+                }
+            }
+
+            getAuthHeaders() {
+                const userData = sessionStorage.getItem('currentUser');
+                if (!userData) {
+                    alert('Sessão expirada. Redirecionando para login...');
+                    window.location.href = '/login.html';
+                    return {};
+                }
+
+                try {
+                    const user = JSON.parse(userData);
+                    return {
+                        'x-user-id': user.username
+                    };
+                } catch (error) {
+                    console.error('Erro ao parsear usuário:', error);
+                    alert('Erro na sessão. Redirecionando para login...');
+                    window.location.href = '/login.html';
+                    return {};
+                }
+            }
+
+            bindEvents() {
+                document.getElementById('consultaForm').addEventListener('submit', (e) => this.buscarApontamentos(e));
+            }
+
+            bindModalEvents() {
+                // Eventos do modal de exclusão
+                document.getElementById('cancelDelete').addEventListener('click', () => this.hideDeleteModal());
+                document.getElementById('confirmDelete').addEventListener('click', () => this.confirmDeleteWorklog());
+
+                // Fechar modal clicando fora dele
+                document.getElementById('deleteModal').addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('deleteModal')) {
+                        this.hideDeleteModal();
+                    }
+                });
+            }
+
+            showDeleteModal(worklogId, time, duration) {
+                document.getElementById('worklogIdToDelete').textContent = worklogId;
+                document.getElementById('worklogTimeToDelete').textContent = time;
+                document.getElementById('worklogDurationToDelete').textContent = duration;
+                document.getElementById('deleteModal').style.display = 'block';
+
+                // Reset completo dos botões do modal
+                const confirmBtn = document.getElementById('confirmDelete');
+                const cancelBtn = document.getElementById('cancelDelete');
+
+                confirmBtn.disabled = false;
+                cancelBtn.disabled = false;
+                confirmBtn.innerHTML = '🗑️ Confirmar';
+
+                // Guardar o ID para uso posterior
+                this.currentWorklogToDelete = worklogId;
+            }
+
+            hideDeleteModal() {
+                document.getElementById('deleteModal').style.display = 'none';
+                this.currentWorklogToDelete = null;
+
+                // Reset dos botões por segurança
+                const confirmBtn = document.getElementById('confirmDelete');
+                const cancelBtn = document.getElementById('cancelDelete');
+
+                confirmBtn.disabled = false;
+                cancelBtn.disabled = false;
+                confirmBtn.innerHTML = '🗑️ Confirmar';
+            }
+
+            async confirmDeleteWorklog() {
+                if (!this.currentWorklogToDelete) {
+                    return;
+                }
+
+                const confirmBtn = document.getElementById('confirmDelete');
+                const cancelBtn = document.getElementById('cancelDelete');
+
+                // Desabilitar botões durante a operação
+                confirmBtn.disabled = true;
+                cancelBtn.disabled = true;
+                confirmBtn.textContent = 'Excluindo...';
+
+                try {
+                    const response = await fetch('/api/delete-worklog', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...this.getAuthHeaders()
+                        },
+                        body: JSON.stringify({
+                            worklogId: this.currentWorklogToDelete
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showStatus('✅ Apontamento excluído com sucesso!', 'success');
+                        this.hideDeleteModal();
+
+                        // Recarregar a lista de apontamentos
+                        const selectedDate = document.getElementById('consultaDate').value;
+                        if (selectedDate) {
+                            await this.buscarApontamentos({ preventDefault: () => {} });
+                        }
+                    } else {
+                        this.showStatus('❌ ' + (result.message || 'Erro ao excluir apontamento'), 'error');
+
+                        // Reabilitar botões
+                        confirmBtn.disabled = false;
+                        cancelBtn.disabled = false;
+                        confirmBtn.innerHTML = '🗑️ Confirmar';
+                    }
+
+                } catch (error) {
+                    console.error('Erro ao excluir worklog:', error);
+                    this.showStatus('❌ Erro de conexão ao excluir apontamento', 'error');
+
+                    // Reabilitar botões
+                    confirmBtn.disabled = false;
+                    cancelBtn.disabled = false;
+                    confirmBtn.innerHTML = '🗑️ Confirmar';
+                }
+            }
+
+            async buscarApontamentos(e) {
+                e.preventDefault();
+
+                const selectedDate = document.getElementById('consultaDate').value;
+                if (!selectedDate) {
+                    this.showStatus('Selecione uma data!', 'error');
+                    return;
+                }
+
+                this.showStatus('🔍 Buscando apontamentos...', 'info');
+                this.showLoading();
+
+                try {
+                    const response = await fetch('/api/consulta-apontamentos', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...this.getAuthHeaders()
+                        },
+                        body: JSON.stringify({
+                            date: selectedDate
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.renderResults(result.worklogs, selectedDate);
+                        this.showStatus(`✅ Encontrados ${result.worklogs.length} apontamentos`, 'success');
+                    } else {
+                        this.showStatus('❌ ' + result.message, 'error');
+                        this.hideResults();
+                    }
+                } catch (error) {
+                    this.showStatus('❌ Erro ao buscar apontamentos', 'error');
+                    this.hideResults();
+                    console.error(error);
+                }
+            }
+
+            showLoading() {
+                const resultadosSection = document.getElementById('resultadosSection');
+                const resultadosContent = document.getElementById('resultadosContent');
+
+                resultadosSection.style.display = 'block';
+                resultadosContent.innerHTML = '<div class="loading">🔍 Buscando apontamentos...</div>';
+            }
+
+            hideResults() {
+                document.getElementById('resultadosSection').style.display = 'none';
+            }
+
+            renderResults(worklogs, date) {
+                const resultadosSection = document.getElementById('resultadosSection');
+                const resultadosContent = document.getElementById('resultadosContent');
+
+                resultadosSection.style.display = 'block';
+
+                if (!worklogs || worklogs.length === 0) {
+                    resultadosContent.innerHTML = `
+                        <div class="no-data">
+                            📭 Nenhum apontamento encontrado para ${this.formatDate(date)}
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Calcular total de horas
+                const totalStats = this.calculateTotalTime(worklogs);
+
+                const tableHtml = `
+                    <table class="worklog-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 30px; text-align: center;"></th>
+                                <th style="width: 70px;">Horário</th>
+                                <th style="width: 70px; text-align: center;">Duração</th>
+                                <th style="padding-left: 24px;">Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${worklogs.map((worklog, index) => `
+                                <tr>
+                                    <td style="text-align: center; width: 30px; padding: 2px;">
+                                        <button class="delete-btn" onclick="consultaManager.showDeleteModal('${worklog.tempoWorklogId || worklog.id || 'ID' + index}', '${worklog.startTime || '--:--'}', '${worklog.timeSpent || 'N/A'}')" title="Excluir apontamento">
+                                            🗑️
+                                        </button>
+                                    </td>
+                                    <td style="width: 70px; font-size: 0.9rem; padding-left: 8px;">${worklog.startTime || '--:--'}</td>
+                                    <td style="width: 70px; font-size: 0.9rem; text-align: center;">${worklog.timeSpent || 'N/A'}</td>
+                                    <td style="word-break: break-word; font-size: 0.9rem; padding-left: 24px; padding-right: 8px;">${worklog.comment || 'Sem descrição'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td></td>
+                                <td style="padding-left: 24px;"><strong>TOTAL: </strong></td>
+                                <td></td>
+                                <td><strong>${totalStats.formatted}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                `;
+
+                resultadosContent.innerHTML = tableHtml;
+            }
+
+            calculateTotalTime(worklogs) {
+                let totalMinutes = 0;
+
+                for (const worklog of worklogs) {
+                    if (worklog.timeSpent) {
+                        // Converter formato "1h 30m" ou "45m" para minutos
+                        const timeStr = worklog.timeSpent.toLowerCase();
+
+                        // Extrair horas
+                        const hoursMatch = timeStr.match(/(\d+)h/);
+                        const hours = hoursMatch ? parseInt(hoursMatch[1]) : 0;
+
+                        // Extrair minutos
+                        const minutesMatch = timeStr.match(/(\d+)m/);
+                        const minutes = minutesMatch ? parseInt(minutesMatch[1]) : 0;
+
+                        totalMinutes += (hours * 60) + minutes;
+                    }
+                }
+
+                // Converter de volta para formato legível
+                const totalHours = Math.floor(totalMinutes / 60);
+                const remainingMinutes = totalMinutes % 60;
+
+                let formatted = '';
+                if (totalHours > 0 && remainingMinutes > 0) {
+                    formatted = `${totalHours}h ${remainingMinutes}m`;
+                } else if (totalHours > 0) {
+                    formatted = `${totalHours}h`;
+                } else if (remainingMinutes > 0) {
+                    formatted = `${remainingMinutes}m`;
+                } else {
+                    formatted = '0m';
+                }
+
+                return {
+                    totalMinutes: totalMinutes,
+                    hours: totalHours,
+                    minutes: remainingMinutes,
+                    formatted: formatted
+                };
+            }
+
+            formatDate(dateString) {
+                const date = new Date(dateString + 'T00:00:00');
+                return date.toLocaleDateString('pt-BR');
+            }
+
+            showStatus(message, type) {
+                const statusEl = document.getElementById('statusMessage');
+                statusEl.textContent = message;
+                statusEl.className = `status-message status-${type}`;
+                statusEl.style.display = 'block';
+
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        const consultaManager = new ConsultaManager();
+
+        // Atualizar subtítulo com nome do usuário
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const userData = JSON.parse(currentUser);
+                const headerSubtitle = document.getElementById('headerSubtitle');
+                if (headerSubtitle && userData && userData.username) {
+                    headerSubtitle.textContent = `Apontamentos JIRA - ${userData.username}`;
+                }
+            } catch (error) {
+                console.error('Erro ao verificar usuário:', error);
+            }
+        });
+    </script>
+
+    <footer>
+        <p>Powered by GRUPO 02 - SENAC</p>
+    </footer>
+</body>
+</html>
