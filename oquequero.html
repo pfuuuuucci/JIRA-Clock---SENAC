@@ -1,0 +1,291 @@
+
+<!-- Cole aqui o conteúdo do mensagem-convencional.html -->
+<!-- Especialmente a parte do campo de data que você gosta -->
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enviar Mensagem Convencional - CondoApp</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background: #f8f9fa; min-height: 100vh; }
+    .container { max-width: 700px; }
+    .navbar .back-btn {
+      color: #fff;
+      font-size: 1.7rem;
+      text-decoration: none;
+      margin-left: auto;
+    }
+    .navbar .back-btn:hover {
+      color: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-light bg-primary">
+    <div class="container-fluid d-flex align-items-center">
+      <span class="navbar-brand mb-0 h1 text-white">CondoApp</span>
+      <a href="#" class="back-btn ms-auto" onclick="goBack()" title="Voltar">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <div class="card shadow">
+      <div class="card-body">
+        <h4 class="card-title mb-4">Enviar Mensagem Convencional</h4>
+        <form id="msgConvencionalForm">
+
+          <!-- Assunto -->
+          <div class="mb-3">
+            <label for="assunto" class="form-label">Assunto</label>
+            <input type="text" class="form-control" id="assunto" required maxlength="200" placeholder="Digite o assunto da mensagem">
+          </div>
+
+          <!-- Mensagem -->
+          <div class="mb-3">
+            <label for="mensagem" class="form-label">Mensagem</label>
+            <textarea class="form-control" id="mensagem" rows="5" required placeholder="Digite sua mensagem aqui..."></textarea>
+          </div>
+
+          <!-- Vigência -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="inicioVigencia" class="form-label">Início da Vigência</label>
+              <input type="datetime-local" class="form-control" id="inicioVigencia" required>
+            </div>
+            <div class="col-md-6">
+              <label for="fimVigencia" class="form-label">Fim da Vigência</label>
+              <input type="datetime-local" class="form-control" id="fimVigencia" required>
+            </div>
+          </div>
+
+          <!-- Destinatários (oculto para moradores) -->
+          <div class="mb-3" id="destinatarioSection">
+            <label for="destinatarioTipo" class="form-label">Enviar para</label>
+            <select class="form-select" id="destinatarioTipo" required>
+              <option value="">Selecione o destinatário</option>
+              <option value="unidade">Unidade Específica</option>
+              <option value="grupo">Grupo</option>
+            </select>
+          </div>
+
+          <!-- Seleção da Unidade -->
+          <div class="mb-3" id="unidadeContainer" style="display: none;">
+            <label for="unidadeSelect" class="form-label">Unidade</label>
+            <select class="form-select" id="unidadeSelect">
+              <option value="">Selecione a unidade</option>
+            </select>
+          </div>
+
+          <!-- Seleção do Grupo -->
+          <div class="mb-3" id="grupoContainer" style="display: none;">
+            <label for="grupoSelect" class="form-label">Grupo</label>
+            <select class="form-select" id="grupoSelect">
+              <option value="">Selecione o grupo</option>
+            </select>
+          </div>
+
+          <!-- Aviso para moradores -->
+          <div class="mb-3" id="moradorInfo" style="display: none;">
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i> Sua mensagem será enviada diretamente para o síndico.
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-send"></i> Enviar Mensagem Convencional
+          </button>
+          <div id="msgStatus" class="mt-2"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+
+    function goBack() {
+      window.location.href = 'dashboard.html';
+    }
+
+    // Controla interface baseada no perfil do usuário
+    document.addEventListener('DOMContentLoaded', function() {
+      if (currentUser.role === 'morador') {
+        // Ocultar seção de destinatários para moradores
+        document.getElementById('destinatarioSection').style.display = 'none';
+        document.getElementById('moradorInfo').style.display = 'block';
+
+        // Pré-definir valores para envio automático para síndico
+        document.getElementById('destinatarioTipo').value = 'unidade';
+        document.getElementById('destinatarioTipo').removeAttribute('required');
+
+        // Carregar unidades e selecionar "Síndico" automaticamente
+        loadUnidadesParaMorador();
+      }
+    });
+
+    // Controla exibição de destinatários
+    document.getElementById('destinatarioTipo').onchange = function() {
+      const tipo = this.value;
+      document.getElementById('unidadeContainer').style.display = tipo === 'unidade' ? 'block' : 'none';
+      document.getElementById('grupoContainer').style.display = tipo === 'grupo' ? 'block' : 'none';
+
+      if (tipo === 'unidade') loadUnidades();
+      if (tipo === 'grupo') loadGrupos();
+    };
+
+    // Carrega unidades
+    async function loadUnidades() {
+      const res = await fetch('/api/unidades');
+      const unidades = await res.json();
+      const select = document.getElementById('unidadeSelect');
+      select.innerHTML = '<option value="">Selecione a unidade</option>';
+      unidades.forEach(u => {
+        select.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
+      });
+    }
+
+    // Carrega grupos
+    async function loadGrupos() {
+      const res = await fetch('/api/grupos');
+      const grupos = await res.json();
+      const select = document.getElementById('grupoSelect');
+      select.innerHTML = '<option value="">Selecione o grupo</option>';
+      grupos.forEach(g => {
+        select.innerHTML += `<option value="${g.id}">${g.nome || g.blocoNome + ' - ' + g.agrupadorNome}</option>`;
+      });
+    }
+
+    // Carrega unidades e seleciona "Síndico" automaticamente para moradores
+    async function loadUnidadesParaMorador() {
+      try {
+        // Para moradores, sempre usar envio por role (sindico-role)
+        document.getElementById('destinatarioTipo').value = 'sindico-role';
+        console.log('✅ Configurado para enviar diretamente aos síndicos via role');
+      } catch (error) {
+        console.error('❌ Erro ao configurar envio para síndicos:', error);
+        alert('Erro ao configurar sistema. Tente novamente.');
+      }
+    }
+
+    // Envio do formulário
+    document.getElementById('msgConvencionalForm').onsubmit = async function(e) {
+      e.preventDefault();
+
+      const assunto = document.getElementById('assunto').value;
+      const content = document.getElementById('mensagem').value;
+      const destinatarioTipo = document.getElementById('destinatarioTipo').value;
+      const inicioVigencia = document.getElementById('inicioVigencia').value;
+      const fimVigencia = document.getElementById('fimVigencia').value;
+
+      let destinatarioId;
+      let finalDestinatarioTipo = destinatarioTipo;
+
+      if (currentUser.role === 'morador') {
+        // Para moradores, sempre usar sindico-role
+        finalDestinatarioTipo = 'sindico-role';
+        destinatarioId = 0; // Não precisa de ID específico para sindico-role
+      } else {
+        // Para síndicos e mensageiros, usar seleção normal
+        if (destinatarioTipo === 'unidade') {
+          destinatarioId = parseInt(document.getElementById('unidadeSelect').value);
+        } else {
+          destinatarioId = parseInt(document.getElementById('grupoSelect').value);
+        }
+      }
+
+      const res = await fetch('/api/enviar-msg-convencional', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sender: currentUser.name,
+          assunto,
+          content,
+          destinatarioTipo: finalDestinatarioTipo,
+          destinatarioId,
+          inicioVigencia,
+          fimVigencia
+        })
+      });
+
+      const data = await res.json();
+      const status = document.getElementById('msgStatus');
+
+      if (data.success) {
+        status.innerHTML = '<div class="alert alert-success">✅ Mensagem convencional enviada com sucesso!</div>';
+
+        // Pergunta se deseja enviar uma nova mensagem
+        setTimeout(async () => {
+          if (await confirmarAcao('Mensagem enviada com sucesso! Deseja enviar uma nova mensagem?')) {
+            // Sim - recarrega a tela
+            location.reload();
+          } else {
+            // Não - volta para dashboard
+            window.location.href = 'dashboard.html';
+          }
+        }, 1500);
+      } else {
+        status.innerHTML = `<div class="alert alert-danger">❌ ${data.error}</div>`;
+      }
+    };
+
+    // Define data/hora atual como padrão
+    function setDefaultDateTime() {
+      const now = new Date();
+      const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      document.getElementById('inicioVigencia').value = localDateTime;
+
+      const oneHour = new Date(now.getTime() + 60 * 60 * 1000 - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      document.getElementById('fimVigencia').value = oneHour;
+    }
+
+    // Função de confirmação personalizada com Sim/Não
+    async function confirmarAcao(mensagem) {
+      return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+          background: rgba(0,0,0,0.5); display: flex; align-items: center; 
+          justify-content: center; z-index: 9999;
+        `;
+
+        modal.innerHTML = `
+          <div style="background: white; padding: 20px; border-radius: 8px; max-width: 400px; text-align: center;">
+            <p style="margin-bottom: 20px; font-size: 16px;">${mensagem}</p>
+            <button id="btnSim" style="background: #007bff; color: white; border: none; padding: 8px 20px; margin: 0 5px; border-radius: 4px; cursor: pointer;">Sim</button>
+            <button id="btnNao" style="background: #6c757d; color: white; border: none; padding: 8px 20px; margin: 0 5px; border-radius: 4px; cursor: pointer;">Não</button>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        document.getElementById('btnSim').onclick = () => {
+          document.body.removeChild(modal);
+          resolve(true);
+        };
+
+        document.getElementById('btnNao').onclick = () => {
+          document.body.removeChild(modal);
+          resolve(false);
+        };
+
+        modal.onclick = (e) => {
+          if (e.target === modal) {
+            document.body.removeChild(modal);
+            resolve(false);
+          }
+        };
+      });
+    }
+
+    // Inicialização
+    setDefaultDateTime();
+  </script>
+</body>
+</html>
