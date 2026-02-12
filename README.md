@@ -2,6 +2,9 @@
 
 Sistema web para registro de apontamentos de horas no JIRA/Tempo por meio de comandos de voz, com autenticacao por e-mail e gerenciamento de favoritos.
 
+O aplicativo encontra-se em ambiente produtivo, no endereço abaixo:
+https://jira-clock-senac.replit.app
+
 ---
 
 ## Sobre o Projeto
