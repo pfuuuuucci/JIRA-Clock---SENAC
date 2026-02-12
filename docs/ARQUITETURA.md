@@ -7,12 +7,12 @@ O **JIRA Voice Assistant** e uma aplicacao web que permite o registro de apontam
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                      NAVEGADOR                          │
-│  ┌───────────────┐  ┌──────────┐  ┌──────────────────┐ │
-│  │  index.html   │  │ app.js   │  │   styles.css     │ │
-│  │  login.html   │  │ (Voice   │  │   (Layout e      │ │
-│  │  config.html  │  │  Recog.) │  │    Tema)         │ │
-│  │  consulta.html│  │          │  │                  │ │
-│  └───────────────┘  └──────────┘  └──────────────────┘ │
+│  ┌───────────────┐  ┌──────────┐  ┌──────────────────┐  │
+│  │  index.html   │  │ app.js   │  │   styles.css     │  │
+│  │  login.html   │  │ (Voice   │  │   (Layout e      │  │
+│  │  config.html  │  │  Recog.) │  │    Tema)         │  │
+│  │  consulta.html│  │          │  │                  │  │
+│  └───────────────┘  └──────────┘  └──────────────────┘  │
 │         │                │                              │
 │         └────────────────┘                              │
 │                  │  HTTP / REST API                     │
@@ -21,24 +21,24 @@ O **JIRA Voice Assistant** e uma aplicacao web que permite o registro de apontam
 ┌──────────────────▼──────────────────────────────────────┐
 │               SERVIDOR (Node.js + Express)              │
 │                                                         │
-│  ┌─────────────┐  ┌────────────────────────────────┐   │
-│  │  index.js   │  │  Modulos de Negocios           │   │
-│  │  (Rotas +   │  │  ┌─────────────────────────┐   │   │
-│  │   Server)   │  │  │ auth.js                 │   │   │
-│  │             │  │  │ (Autenticacao por Email) │   │   │
-│  │             │  │  ├─────────────────────────┤   │   │
-│  │             │  │  │ user-jira-integration.js│   │   │
-│  │             │  │  │ (Integracao JIRA/Tempo) │   │   │
-│  │             │  │  ├─────────────────────────┤   │   │
-│  │             │  │  │ database.js             │   │   │
-│  │             │  │  │ (Acesso a Dados)        │   │   │
-│  │             │  │  └─────────────────────────┘   │   │
-│  └─────────────┘  └────────────────────────────────┘   │
+│  ┌─────────────┐  ┌────────────────────────────────┐    │
+│  │  index.js   │  │  Modulos de Negocios           │    │
+│  │  (Rotas +   │  │  ┌─────────────────────────┐   │    │
+│  │   Server)   │  │  │ auth.js                 │   │    │
+│  │             │  │  │(Autenticacao por Email) │   │    │
+│  │             │  │  ├─────────────────────────┤   │    │
+│  │             │  │  │ user-jira-integration.js│   │    │
+│  │             │  │  │ (Integracao JIRA/Tempo) │   │    │
+│  │             │  │  ├─────────────────────────┤   │    │
+│  │             │  │  │ database.js             │   │    │
+│  │             │  │  │ (Acesso a Dados)        │   │    │
+│  │             │  │  └─────────────────────────┘   │    │
+│  └─────────────┘  └────────────────────────────────┘    │
 │         │                       │                       │
 └─────────┼───────────────────────┼───────────────────────┘
           │                       │
   ┌───────▼───────┐   ┌──────────▼──────────┐
-  │  APIs Externas │   │   PostgreSQL (Neon) │
+  │ APIs Externas │   │   PostgreSQL (Neon) │
   │  ┌───────────┐│   │                     │
   │  │ JIRA REST ││   │  users              │
   │  │ API v3    ││   │  user_credentials   │
