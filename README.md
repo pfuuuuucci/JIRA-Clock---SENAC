@@ -7,7 +7,7 @@ https://jira-clock-senac.replit.app
 
 Os servidores de Backend e Frontend estão operacionais na plataforma REPLIT.COM
 
-O vídeo demonstrativo do funcionamento da aplicação está em .
+O vídeo demonstrativo do funcionamento da aplicação está em https://github.com/pfuuuuucci/JIRA-Clock---SENAC/blob/main/docs/Video%20JIRA%20CLOCK%20SENAC%20-%20Projeto%20Integrador.MP4.
 
 ---
 
