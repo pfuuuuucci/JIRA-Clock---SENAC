@@ -14,15 +14,15 @@ O vídeo demonstrativo do funcionamento da aplicação está em [`docs/Video JIR
 
 ## Sobre o Projeto
 
-O **JIRA Voice Assistant** permite que profissionais registrem suas horas de trabalho no JIRA de forma rapida e intuitiva usando a voz. O usuario fala a atividade que realizou, e o sistema extrai automaticamente as informacoes de tempo, projeto, descricao e ticket, enviando o apontamento diretamente para o JIRA/Tempo.
+O **JIRA Voice Assistant** permite que profissionais registrem suas horas de trabalho no JIRA de forma rápida e intuitiva usando a voz. O usuário fala a atividade que realizou, e o sistema extrai automaticamente as informações de tempo, projeto, descrição e ticket, enviando o apontamento diretamente para o JIRA/Tempo.
 
 ### Principais Funcionalidades
 
-- **Registro por voz**: Captura de fala via Web Speech API com extracao automatica de dados (tempo, projeto, descricao).
+- **Registro por voz**: Captura de fala via Web Speech API com extração automática de dados (tempo, projeto, descrição).
 - **Integracao JIRA/Tempo**: Busca de tickets, registro de worklogs e consulta de apontamentos.
-- **Autenticacao por e-mail**: Login via token enviado por e-mail com sessao de 12 horas por dispositivo.
-- **Tickets favoritos**: Salve tickets frequentes para acesso rapido.
-- **Descricoes favoritas**: Reutilize descricoes de atividades recorrentes.
+- **Autenticação por e-mail**: Login via token enviado por e-mail com sessão de 12 horas por dispositivo.
+- **Tickets favoritos**: Salve tickets frequentes para acesso rápido.
+- **Descrições favoritas**: Reutilize descrições de atividades recorrentes.
 - **Consulta de apontamentos**: Visualize os apontamentos registrados por data.
 - **Backup automatizado**: Sistema de backup do banco de dados com envio por e-mail.
 - **PWA (Progressive Web App)**: Instalavel no dispositivo como aplicativo nativo.
