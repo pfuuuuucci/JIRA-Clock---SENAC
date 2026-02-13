@@ -44,15 +44,15 @@ O **JIRA Voice Assistant** permite que profissionais registrem suas horas de tra
 
 ## Arquitetura
 
-O projeto utiliza a arquitetura **Cliente-Servidor**, onde um unico servidor Node.js/Express serve tanto o frontend estatico quanto a API REST do backend.
+O projeto utiliza a arquitetura **Cliente-Servidor**, onde um único servidor Node.js/Express serve tanto o frontend estático quanto a API REST do backend.
 
-A documentacao completa da arquitetura esta em [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md).
+A documentação completa da arquitetura está em [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md).
 
-O modelo fisico do banco de dados (DDL) esta em [`docs/DDL_modelo_fisico.sql`](docs/DDL_modelo_fisico.sql).
+O modelo físico do banco de dados (DDL) está em [`docs/DDL_modelo_fisico.sql`](docs/DDL_modelo_fisico.sql).
 
 ---
 
-## Pre-requisitos
+## Pré-requisitos 
 
 - Node.js 22 ou superior
 - PostgreSQL 16
@@ -61,9 +61,9 @@ O modelo fisico do banco de dados (DDL) esta em [`docs/DDL_modelo_fisico.sql`](d
 
 ---
 
-## Variaveis de Ambiente
+## Variáveis de Ambiente
 
-Crie um arquivo `.env` na raiz do projeto com as seguintes variaveis:
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 
 ```env
 DATABASE_URL=postgresql://usuario:senha@host:porta/banco
@@ -77,7 +77,7 @@ PORT=5000
 
 ---
 
-## Instalacao e Execucao
+## Instalação e Execução 
 
 ```bash
 # 1. Clonar o repositorio
@@ -86,7 +86,7 @@ git clone <url-do-repositorio>
 # 2. Instalar dependencias
 npm install
 
-# 3. Configurar variaveis de ambiente
+# 3. Configurar variáveis de ambiente
 cp .env.example .env
 # Edite o .env com suas credenciais
 
@@ -96,7 +96,7 @@ node index.js
 
 O servidor inicia na porta 5000. Acesse: `http://localhost:5000`
 
-Na primeira execucao, as tabelas do banco sao criadas automaticamente e, se houver dados nos arquivos JSON legados, a migracao e feita automaticamente.
+Na primeira execução, as tabelas do banco são criadas automaticamente e, se houver dados nos arquivos JSON legados, a migração é feita automaticamente.
 
 ---
 
@@ -133,30 +133,30 @@ Na primeira execucao, as tabelas do banco sao criadas automaticamente e, se houv
 
 O banco de dados PostgreSQL possui 6 tabelas:
 
-| Tabela                        | Descricao                                      |
+| Tabela                        | Descrição                                      |
 |-------------------------------|-------------------------------------------------|
-| `users`                       | Cadastro de usuarios                            |
-| `user_credentials`            | Credenciais JIRA/Tempo por usuario              |
-| `user_projects`               | Projetos JIRA configurados por usuario          |
+| `users`                       | Cadastro de usuários                            |
+| `user_credentials`            | Credenciais JIRA/Tempo por usuário              |
+| `user_projects`               | Projetos JIRA configurados por usuário          |
 | `user_favorites`              | Tickets JIRA favoritos                          |
-| `user_favorite_descriptions`  | Descricoes de atividades favoritas              |
-| `daily_token_validations`     | Controle de sessoes por dispositivo             |
+| `user_favorite_descriptions`  | Descrições de atividades favoritas              |
+| `daily_token_validations`     | Controle de sessões por dispositivo             |
 
-O script DDL completo esta em [`docs/DDL_modelo_fisico.sql`](docs/DDL_modelo_fisico.sql).
+O script DDL completo está em [`docs/DDL_modelo_fisico.sql`](docs/DDL_modelo_fisico.sql).
 
 ---
 
 ## Endpoints da API
 
-### Autenticacao
-| Metodo | Rota                          | Descricao                      |
+### Autenticação 
+| Metodo | Rota                          | Descrição                      |
 |--------|-------------------------------|--------------------------------|
-| POST   | `/api/auth/check-user`        | Verificar usuario e enviar token |
+| POST   | `/api/auth/check-user`        | Verificar usuário e enviar token |
 | POST   | `/api/auth/validate-token`    | Validar token de acesso        |
-| GET    | `/api/auth/current-user`      | Obter usuario autenticado      |
+| GET    | `/api/auth/current-user`      | Obter usuário autenticado      |
 
 ### Apontamentos
-| Metodo | Rota                           | Descricao                      |
+| Metodo | Rota                           | Descrição                      |
 |--------|--------------------------------|--------------------------------|
 | POST   | `/api/parse-voice`             | Analisar texto de voz          |
 | POST   | `/api/log-work`                | Registrar apontamento          |
@@ -171,7 +171,7 @@ O script DDL completo esta em [`docs/DDL_modelo_fisico.sql`](docs/DDL_modelo_fis
 | GET    | `/api/favorites/by-project/:projectKey`     | Favoritos por projeto    |
 
 ### Configuracao
-| Metodo | Rota                                  | Descricao                    |
+| Metodo | Rota                                  | Descrição                    |
 |--------|---------------------------------------|------------------------------|
 | GET    | `/api/config`                         | Carregar configuracao        |
 | POST   | `/api/config/credentials`             | Salvar credenciais JIRA      |
@@ -179,7 +179,7 @@ O script DDL completo esta em [`docs/DDL_modelo_fisico.sql`](docs/DDL_modelo_fis
 | DELETE | `/api/config/projects/:projectName`   | Remover projeto              |
 
 ### Backup
-| Metodo | Rota                    | Descricao                    |
+| Metodo | Rota                    | Descrição                    |
 |--------|-------------------------|------------------------------|
 | POST   | `/api/backup/create`    | Criar backup                 |
 | GET    | `/api/backup/list`      | Listar backups               |
@@ -191,7 +191,7 @@ O script DDL completo esta em [`docs/DDL_modelo_fisico.sql`](docs/DDL_modelo_fis
 
 ## Autor
 
-Desenvolvido como projeto academico universitario.
+Desenvolvido como projeto acadêmico universitario.
 
 ---
 
